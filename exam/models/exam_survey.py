@@ -12,6 +12,7 @@ class SurveySurvey(models.Model):
     class_id = fields.Many2one('school.standard', 'Standard')
     academic_year_id = fields.Many2one("academic.year", 'Academic Year', help="Select Academic Year")
     s_exam_id = fields.Many2one("exam.exam", "Examination", help="Select Exam")
+    option_count = fields.Char(string="No of options", placeholder="2 or 4", default="2")
 
 
 class SurveyUserInput(models.Model):

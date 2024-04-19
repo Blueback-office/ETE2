@@ -11,6 +11,7 @@
 				<field name='class_id'/>
 				<field name='academic_year_id'/>
 				<field name='s_exam_id'/>
+				<field name="option_count"/>
 			</xpath>
             <xpath expr="//button[@name='action_send_survey']" position='attributes'>
                 <attribute name="context">{'default_standard_id' : class_id}</attribute>

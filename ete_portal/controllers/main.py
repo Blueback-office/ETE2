@@ -1,0 +1,179 @@
+
+from collections import OrderedDict
+from operator import itemgetter
+from odoo import fields
+from odoo import http
+from odoo.http import request
+from odoo.tools import date_utils, groupby as groupbyelem
+from odoo.addons.portal.controllers.portal import CustomerPortal
+from odoo.tools.translate import _
+from odoo.exceptions import UserError, ValidationError
+
+
+
+class WebsiteMyAccount(CustomerPortal):
+
+    # def get_domain_my_school(self, user):
+    #     emp = request.env['hr.employee'].search([('user_id', '=', user.id)],
+    #                                             limit=1)
+    #     return [
+    #         ('employee_id', '=', emp and emp.id or False),
+    #     ]
+
+    def _prepare_home_portal_values(self, counters):
+        values = super()._prepare_home_portal_values(counters)
+        # Leaves = request.env['hr.leave']
+        if 'result_count' in counters:
+            # values['leave_count'] = Leaves.search_count(self.get_domain_my_leaves(request.env.user)) if Leaves.check_access_rights('read', raise_exception=False) else 0
+            values['result_count'] = '1'
+        return values
+    
+
+    @http.route(['/result', '/result/page/<int:page>'], type='http', auth="user", website=True)
+    def portal_my_results(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, groupby='none', **kw):
+        values = self._prepare_portal_layout_values()
+        # HrLeave = request.env['hr.leave']
+        # Timeoff_sudo = request.env['hr.leave'].sudo()
+        # domain = self.get_domain_my_school(request.env.user)
+
+        # holiday_domain=([('virtual_remaining_leaves', '>', 0)])
+        # holiday_type_ids = request.env['hr.leave.type'].search(holiday_domain)
+        School_obj = request.env['school.school']
+        Standard_obj = request.env['standard.standard']
+        Student_obj = request.env['student.student']
+        Subject_obj = request.env['subject.subject']
+        Survey_obj = request.env['survey.survey']
+        # user = request.env.user
+        # emp = request.env['hr.employee'].search([('user_id', '=', user.id)],
+        #                                         limit=1)
+        # values.update({
+        #     'holiday_types':holiday_type_ids.with_context({'employee_id':emp and emp.id or False}).name_get()})
+        # # fileter  By
+        # searchbar_filters = {
+        #     'all': {'label': _('All'), 'domain': []},
+        #     'confirm': {'label': _('To Approve'), 'domain': [('state', '=', 'confirm')]},
+        #     'refuse': {'label': _('Refused'), 'domain': [('state', '=', 'refuse')]},
+        #     'validate1': {'label': _('Second Approval'), 'domain': [('state', '=', 'validate1')]},
+        #     'validate': {'label': _('Approved'), 'domain': [('state', '=', 'validate')]},
+        # }
+        # # sort By
+        # searchbar_sortings = {
+        #     'date': {'label': _('Newest'), 'order': 'create_date desc'},
+        #     'name': {'label': _('Name'), 'order': 'name'},
+        # }
+        # # group By
+        # searchbar_groupby = {
+        #     'none': {'input': 'none', 'label': _('None')},
+        #     'timeoff': {'input': 'timeoff', 'label': _('Time Off Type')},
+        # }
+        # # default sort by value
+        # if not sortby:
+        #     sortby = 'date'
+        # order = searchbar_sortings[sortby]['order']
+        # # default filter by value
+        # if not filterby:
+        #     filterby = 'all'
+        # domain += searchbar_filters[filterby]['domain']
+        # if date_begin and date_end:
+        #     domain += [('create_date', '>', date_begin), ('create_date', '<=', date_end)]
+        # pager
+        # result_count = HrLeave.search_count(domain)
+        result_count = 1
+        pager = request.website.pager(
+            url="/result",
+            url_args={'date_begin': date_begin, 'date_end': date_end, 'sortby': sortby, 'filterby': filterby},
+            total=result_count,
+            page=page,
+            step=self._items_per_page
+        )
+        # # default groupby
+        # if groupby == 'timeoff':
+        #     order = "holiday_status_id, %s" % order
+        # content according to pager and archive selected
+        school = School_obj.search([])
+        standard = Standard_obj.search([])
+        student = Student_obj.search([])
+        subject = Subject_obj.search([])
+        survey = Survey_obj.search([])
+        # if groupby == 'none':
+        #     grouped_timeoff = []
+        #     if leaves:
+        #         grouped_timeoff = [leaves]
+        # else:
+        #     grouped_timeoff = [Timeoff_sudo.concat(*g) for k, g in groupbyelem(leaves, itemgetter('holiday_status_id'))]
+        values.update({
+            'date': date_begin,
+            'schools': school,
+            'standards': standard,
+            'students': student,
+            'subjects': subject,
+            'surveys': survey,
+            # 'grouped_timeoff': grouped_timeoff,
+            'page_name': 'result',
+            'default_url': '/result',
+            'pager': pager,
+            # 'searchbar_sortings': searchbar_sortings,
+            # 'searchbar_filters': OrderedDict(sorted(searchbar_filters.items())),
+            # 'searchbar_groupby': searchbar_groupby,
+            'sortby': sortby,
+            'groupby': groupby,
+            'filterby': filterby,
+        })
+        return request.render("ete_portal.portal_my_result_details", values)
+
+    # @http.route(['''/my/timeoff/<model('hr.leave'):timeoff>'''], type='http', auth="user", website=True)
+    # def portal_my_timeoff(self, timeoff, **kw):
+    #     user = request.env.user
+    #     emp = request.env['hr.employee'].search([('user_id', '=', user.id)],
+    #                                             limit=1)
+    #     holiday_domain=([('virtual_remaining_leaves', '>', 0),
+    #                      # ('requires_allocation', 'in', ['yes']),
+    #                      # ('max_leaves', '>', '0')
+    #                      ])
+    #     holiday_type_ids = request.env['hr.leave.type'].search(holiday_domain)
+    #     return request.render(
+    #         "portal_timeoff.portal_my_timeoff", {
+    #             'timeoff': timeoff,
+    #             'holiday_types':holiday_type_ids.with_context({'employee_id':emp and emp.id or False}).name_get(),
+    #             'emp_id': emp and emp.id or False,
+    #             'page_name': 'leave_details',
+    #         })
+
+    # @http.route(['/my/leaves/summary'], type='http', auth="user", website=True)
+    # def leaves_summary(self):
+    #     get_days_all_request = request.env['hr.leave.type'].get_allocation_data_request()
+    #     return request.render(
+    #         "portal_timeoff.my_leaves_summary",{
+    #             'timeoffs':get_days_all_request})
+
+
+    @http.route('/get_survey_data', type='json', auth='user')
+    def get_survey_data(self, survey_id):
+        if not survey_id:
+            raise ValidationError("Survey ID is required.")
+
+        survey = http.request.env['survey.survey'].sudo().search([('id', '=', int(survey_id))], limit=1)
+
+        if not survey:
+            raise ValidationError("Survey not found.")
+
+        question_and_page_data = {}
+        for question_and_page in survey.question_and_page_ids:
+            question_and_page_data[question_and_page.id] = {
+                'title': question_and_page.title,
+                'question_type': question_and_page.question_type,
+                'suggested_answer_ids': [answer.value for answer in question_and_page.suggested_answer_ids]
+                # 'suggested_answer_ids': question_and_page.suggested_answer_ids.ids
+                # Add other fields as needed
+            }
+
+        return {
+            'question_and_page_data': question_and_page_data,
+            'Survey': {
+                'id': survey.id,
+                'name': survey.title,
+                'option_count': survey.option_count
+                # Add other survey fields as needed
+            }
+            # Add other fields as needed
+        }
