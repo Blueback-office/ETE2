@@ -689,21 +689,42 @@ class SubCategory(models.Model):
 
     _name = "sub.category"
     _description = "Sub Category"
-    _rec_name='display_name'
+    _parent_name = "parent_id"
+    _parent_store = True
+    _rec_name = 'complete_name'
+    _order = 'complete_name'
 
     name = fields.Char('Category',help="Category",required=True)
     parent_id = fields.Many2one('sub.category','Parent Subject')
+    complete_name = fields.Char(
+        'Complete Name', compute='_compute_complete_name', recursive=True,
+        store=True)
+    parent_path = fields.Char(index=True, unaccent=False)
+    child_id = fields.One2many('sub.category', 'parent_id', 'Child Categories')
     display_name = fields.Char(compute='_compute_display_name')
     code = fields.Char()
 
     _sql_constraints = [('unique_code', 'UNIQUE(code)', 'Code Must be Unique!')]
 
-    def _compute_display_name(self):
+    @api.depends('name', 'parent_id.complete_name')
+    def _compute_complete_name(self):
         for record in self:
             if record.parent_id:
-                record.display_name = f"{record.parent_id.name} / {record.name}"
+                record.complete_name = '%s / %s' % (record.parent_id.complete_name, record.name)
             else:
-                record.display_name = record.name
+                record.complete_name = record.name
+
+    @api.model
+    def name_create(self, name):
+        category = self.create({'name': name})
+        return category.id, category.display_name
+
+    @api.depends_context('hierarchical_naming')
+    def _compute_display_name(self):
+        if self.env.context.get('hierarchical_naming', True):
+            return super()._compute_display_name()
+        for record in self:
+            record.display_name = record.name
 
     @api.model
     def _name_search(self, name, domain=None, operator=None, limit=None, order=None):

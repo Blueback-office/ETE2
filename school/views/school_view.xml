@@ -993,7 +993,7 @@
                     <group>
                         <field name='name'/>
                         <field name='parent_id'/>
-                        <field name="code"/>
+                        <field name="code" required='1'/>
                     </group>
                 </sheet>
             </form>
@@ -1005,8 +1005,9 @@
         <field name="model">sub.category</field>
         <field name="arch" type="xml">
             <tree string="Views">
-                <field name='display_name'/>
-                <field name="code"/>
+                <field name='display_name' string='Subject Categories'/>
+                <!-- <field name='complete_name' string='Subject Categories'/> -->
+                 <field name="code"/> 
             </tree>
         </field>
     </record>
