@@ -233,7 +233,7 @@
                                         name="gender"
                                         readonly="state in ['alumni','terminate'] or state == 'done'"
                                         placeholder="Gender"
-                                        required="1"
+                                        required="0"
                                     />
                                     <field name="age" />
                                 </group>
@@ -1137,7 +1137,6 @@
                                                 placeholder="Gender"
                                                 string="Gender"
                                                 readonly="state =='alumni'"
-                                                required="1"
                                             />
                                             <field
                                                 name="date_of_birth"

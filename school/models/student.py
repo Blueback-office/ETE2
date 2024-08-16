@@ -122,8 +122,8 @@ class StudentStudent(models.Model):
     )
     reg_code = fields.Char(string="Registration Code", help="Student Registration Code")
     student_code = fields.Char(help="Enter student code")
-    contact_phone = fields.Char(string="Phone no.", help="Enter student phone no.",required=True)
-    contact_mobile = fields.Char(string="Mobile no", help="Enter student mobile no.",required=True)
+    contact_phone = fields.Char(string="Phone no.", help="Enter student phone no.", required=False)
+    contact_mobile = fields.Char(string="Mobile no", help="Enter student mobile no.", required=False)
     roll_no = fields.Integer("Roll No.", readonly=True, help="Enter student roll no.")
     leaving_certificate = fields.Char(string="leaving_certificate")
     photo = fields.Binary(default=_default_image, help="Attach student photo")
@@ -150,7 +150,7 @@ class StudentStudent(models.Model):
     leave_date = fields.Date(help="Enter student leave date")
     middle = fields.Char(
         "Middle Name",
-        required=True,
+        required=False,
         # states={"done": [("readonly", True)]},
         help="Enter student middle name",
     )
@@ -167,7 +167,7 @@ class StudentStudent(models.Model):
     )
     date_of_birth = fields.Date(
         "BirthDate",
-        required=True,
+        required=False,
         # states={"done": [("readonly", True)]},
         help="Enter student date of birth",
     )
