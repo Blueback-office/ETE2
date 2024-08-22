@@ -326,6 +326,23 @@ class StudentStudent(models.Model):
         help="Activate/Deactivate teacher group",
     )
     subject_id = fields.Many2one("subject.subject", "Subject", help="Subject")
+    result_count = fields.Integer(compute="_compute_results")
+
+    def _compute_results(self):
+        self.result_count = self.env["survey.user_input"].search_count([
+            ("partner_id.student_id", "=", self.id)
+        ])
+
+    def student_results(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Participations',
+            'view_mode': 'tree, form',
+            'views': [(False, 'list'), (False, 'form')],
+            'res_model': 'survey.user_input',
+            'domain': [('partner_id.student_id', '=', self.id)],
+            'context': "{'create': False}"
+        }
 
     # @api.model
     # def get_views(self, views, options=None):
