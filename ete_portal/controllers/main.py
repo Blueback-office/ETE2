@@ -184,7 +184,7 @@ class WebsiteMyAccount(CustomerPortal):
 
         question_and_page_data = {}
         for question_and_page in survey.question_and_page_ids:
-            question_and_page_data[question_and_page.id] = {
+            question_and_page_data[str(question_and_page.sequence)] = {
                 'title': question_and_page.title,
                 'question_type': question_and_page.question_type,
                 'suggested_answer_ids': [answer.value for answer in question_and_page.suggested_answer_ids]
