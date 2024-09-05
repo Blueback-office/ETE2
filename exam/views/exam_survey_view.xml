@@ -10,12 +10,17 @@
                 <field name="exam_type" invisible="1"/>
 				<field name='teacher_id' invisible="1"/>
 				<field name='class_id' invisible='1'/>
-                <field name='standard_id'/>
-				<field name='academic_year_id'/>
-                <field name="subject_id" domain="[('standard_ids', 'in', standard_id)]"/>
-				<field name='s_exam_id' invisible="1"/>
+                <field name='academic_year_id'/>
+                <field name='s_exam_id' invisible="1"/>
                 <field name="option_count"/>
 			</xpath>
+            <xpath expr="//group/group" position="after">
+                <group>
+                    <field name="teacher_ids" widget="many2many_tags" />
+                    <field name='standard_id'/>
+                    <field name="subject_id" domain="[('standard_ids', 'in', standard_id)]"/>
+                </group>
+            </xpath>
             <xpath expr="//button[@name='action_send_survey']" position='attributes'>
                 <attribute name="context">{'default_standard_id' : class_id}</attribute>
             </xpath>

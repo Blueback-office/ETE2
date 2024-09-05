@@ -16,9 +16,14 @@ class WebsiteMyAccount(CustomerPortal):
     def get_domain_my_results(self, user):
         teacher = request.env['school.teacher'].search([('user_id', '=', user.id)],
                                                 limit=1)
-        return [
-            ('teacher_id', '=', teacher and teacher.id or False),
-        ]
+        if (request.env.user.is_student):
+            return [
+                ('partner_id.student_id', '=', request.env.user.student_id and request.env.user.student_id.id or False),
+            ]
+        else:
+            return [
+                ('survey_id.teacher_ids', 'in', teacher.id if teacher else False),
+            ]
 
     def _prepare_home_portal_values(self, counters):
         values = super()._prepare_home_portal_values(counters)
