@@ -165,11 +165,11 @@
                             <tr t-attf-class="{{'thead-light' if not groupby == 'none' else ''}}">
                                 <th t-if="groupby == 'none'"> 
                                     <em t-if="request.env.user.is_student">Student Id</em>
-                                    <em t-else="">Teacher Id</em>
+                                    <!-- <em t-else="">Teacher Id</em> -->
                                 </th>
                                 <th t-else="">
                                     <em t-if="request.env.user.is_student">Student Id</em>
-                                    <em t-else="" class="font-weight-normal text-muted">Teacher Id:</em>
+                                    <em  class="font-weight-normal text-muted">Survey:</em>
                                     <span t-field="result[0].survey_id.display_name"/></th>
                                 <th>Exam</th>  <!-- survey_id -->
                                 <th>Created date</th> <!-- create_date -->

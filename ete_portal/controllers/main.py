@@ -1,13 +1,12 @@
 
 from collections import OrderedDict
 from operator import itemgetter
-from odoo import fields
 from odoo import http
 from odoo.http import request
-from odoo.tools import date_utils, groupby as groupbyelem
+from odoo.tools import groupby as groupbyelem
 from odoo.addons.portal.controllers.portal import CustomerPortal
 from odoo.tools.translate import _
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import ValidationError
 
 
 
@@ -21,8 +20,21 @@ class WebsiteMyAccount(CustomerPortal):
                 ('partner_id.student_id', '=', request.env.user.student_id and request.env.user.student_id.id or False),
             ]
         else:
+            standard_ids = []
+            if teacher:
+                for standard in teacher.sudo().standard_ids:
+                    standard_ids.append(standard.id)
             return [
-                ('survey_id.teacher_ids', 'in', teacher.id if teacher else False),
+                '|',  
+                    ('partner_id.employee_ids.teacher_id', '=', teacher.id if teacher else False), 
+                '|', 
+                    '&',  
+                        ('partner_id.student_id.standard_id', 'in', standard_ids if standard_ids else [False]),
+                        ('partner_id.student_id.school_id', '=', teacher.school_id.id if teacher and teacher.school_id else False),  
+                    '&','&', 
+                        ('teacher_id', '=', teacher.id if teacher else False), 
+                        ('teacher_id.standard_ids', 'in', standard_ids if standard_ids else [False]), 
+                        ('teacher_id.school_id', '=', teacher.school_id.id if teacher and teacher.school_id else False), 
             ]
 
     def _prepare_home_portal_values(self, counters):
@@ -93,7 +105,7 @@ class WebsiteMyAccount(CustomerPortal):
         }
         # # default sort by value
         if not sortby:
-            sortby = 'date'
+            sortby = 'partner_id'
         order = searchbar_sortings[sortby]['order']
         # # default filter by value
         if not filterby:
@@ -106,7 +118,7 @@ class WebsiteMyAccount(CustomerPortal):
         result_count = 1
         pager = request.website.pager(
             url="/result",
-            url_args={'date_begin': date_begin, 'date_end': date_end, 'sortby': sortby, 'filterby': filterby},
+            url_args={'sortby': sortby, 'filterby': filterby},
             total=result_count,
             page=page,
             step=self._items_per_page
