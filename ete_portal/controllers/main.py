@@ -55,15 +55,6 @@ class WebsiteMyAccount(CustomerPortal):
             surveys=[(sur.id, sur.title) for sur in standard.get_result_class_survey()],
         )
         
-    # @http.route(['/result/subject_infos/<int:subject>'], type='json', auth="public", methods=['POST'], website=True)
-    # def subject_infos(self, subject, **kw):
-    #     subject = request.env['subject.subject'].sudo().browse(subject)
-    #     return dict(
-    #         students=[(st.id, st.name) for st in standard.get_result_class_students()],
-    #         subjects=[(sub.id, sub.name) for sub in standard.get_result_class_subjects()],
-    #         surveys=[(sur.id, sur.title) for sur in standard.get_result_class_survey()],
-    #     )
-
     @http.route(['/result', '/result/page/<int:page>'], type='http', auth="user", website=True)
     def portal_my_results(self, date_begin=None, date_end=None, sortby=None, filterby=None, groupby='none', page=1, **kw):
         values = self._prepare_portal_layout_values()
@@ -146,33 +137,6 @@ class WebsiteMyAccount(CustomerPortal):
         })
 
         return request.render("ete_portal.portal_my_result_details", values)
-
-
-    # @http.route(['''/my/timeoff/<model('hr.leave'):timeoff>'''], type='http', auth="user", website=True)
-    # def portal_my_timeoff(self, timeoff, **kw):
-    #     user = request.env.user
-    #     emp = request.env['hr.employee'].search([('user_id', '=', user.id)],
-    #                                             limit=1)
-    #     holiday_domain=([('virtual_remaining_leaves', '>', 0),
-    #                      # ('requires_allocation', 'in', ['yes']),
-    #                      # ('max_leaves', '>', '0')
-    #                      ])
-    #     holiday_type_ids = request.env['hr.leave.type'].search(holiday_domain)
-    #     return request.render(
-    #         "portal_timeoff.portal_my_timeoff", {
-    #             'timeoff': timeoff,
-    #             'holiday_types':holiday_type_ids.with_context({'employee_id':emp and emp.id or False}).name_get(),
-    #             'emp_id': emp and emp.id or False,
-    #             'page_name': 'leave_details',
-    #         })
-
-    # @http.route(['/my/leaves/summary'], type='http', auth="user", website=True)
-    # def leaves_summary(self):
-    #     get_days_all_request = request.env['hr.leave.type'].get_allocation_data_request()
-    #     return request.render(
-    #         "portal_timeoff.my_leaves_summary",{
-    #             'timeoffs':get_days_all_request})
-
 
     @http.route('/get_survey_data', type='json', auth='user')
     def get_survey_data(self, survey_id):
