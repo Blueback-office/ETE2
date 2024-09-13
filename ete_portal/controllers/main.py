@@ -65,83 +65,66 @@ class WebsiteMyAccount(CustomerPortal):
     #     )
 
     @http.route(['/result', '/result/page/<int:page>'], type='http', auth="user", website=True)
-    def portal_my_results(self, page=1, date_begin=None, date_end=None, sortby=None, filterby=None, groupby='none', **kw):
+    def portal_my_results(self, date_begin=None, date_end=None, sortby=None, filterby=None, groupby='none', page=1, **kw):
         values = self._prepare_portal_layout_values()
-        result_input = request.env['survey.user_input']
         result_input_sudo = request.env['survey.user_input'].sudo()
         domain = self.get_domain_my_results(request.env.user)
 
-        # holiday_domain=([('virtual_remaining_leaves', '>', 0)])
-        # holiday_type_ids = request.env['hr.leave.type'].search(holiday_domain)
         School_obj = request.env['school.school']
-        Standard_obj = request.env['standard.standard']
-        Student_obj = request.env['student.student']
         Subject_obj = request.env['subject.subject']
         Survey_obj = request.env['survey.survey']
-        SchoolStd_obj = request.env['school.standard']
-        # user = request.env.user
-        # emp = request.env['hr.employee'].search([('user_id', '=', user.id)],
-        #                                         limit=1)
-        # values.update({
-        #     'holiday_types':holiday_type_ids.with_context({'employee_id':emp and emp.id or False}).name_get()})
-        # # fileter  By
+
+        # Filter and Sort Options
         searchbar_filters = {
             'all': {'label': _('All'), 'domain': []},
             'Passed': {'label': _('Passed'), 'domain': [('scoring_success', '=', True)]},
             'Failed': {'label': _('Failed'), 'domain': [('scoring_success', '=', False)]},
-            # 'refuse': {'label': _('Refused'), 'domain': [('state', '=', 'refuse')]},
-            # 'validate1': {'label': _('Second Approval'), 'domain': [('state', '=', 'validate1')]},
-            # 'validate': {'label': _('Approved'), 'domain': [('state', '=', 'validate')]},
         }
-        # # sort By
+
         searchbar_sortings = {
-            'date': {'label': _('Newest'), 'order': 'create_date desc'},
+            'create_date': {'label': _('Newest'), 'order': 'create_date desc'},
             'partner_id': {'label': _('Name'), 'order': 'partner_id'},
         }
-        # # group By
+
         searchbar_groupby = {
             'none': {'input': 'none', 'label': _('None')},
             'Exam': {'input': 'Exam', 'label': _('Exam')},
         }
-        # # default sort by value
+
+        # Default sortby and filterby
         if not sortby:
             sortby = 'partner_id'
         order = searchbar_sortings[sortby]['order']
-        # # default filter by value
+
         if not filterby:
             filterby = 'all'
         domain += searchbar_filters[filterby]['domain']
-        # if date_begin and date_end:
-        #     domain += [('create_date', '>', date_begin), ('create_date', '<=', date_end)]
-        # pager
-        # result_count = HrLeave.search_count(domain)
-        result_count = 1
-        pager = request.website.pager(
-            url="/result",
-            url_args={'sortby': sortby, 'filterby': filterby},
-            total=result_count,
-            page=page,
-            step=self._items_per_page
-        )
-        # # default groupby
-        if groupby == 'exam':
-            order = "survey_id, %s" % order
-        # content according to pager and archive selected
-        
-        user_teacher = request.env['school.teacher'].sudo().search([('user_id', '=', request.env.user.id)],limit=1)
-        school = School_obj.search([('id','=', user_teacher.school_id.id)])
-        # standard = user_teacher.school_id.standards
+        if date_begin and date_end:
+            domain += [('create_date', '>', date_begin), ('create_date', '<=', date_end)]
+            
+        user_teacher = request.env['school.teacher'].sudo().search([('user_id', '=', request.env.user.id)], limit=1)
+        school = School_obj.search([('id', '=', user_teacher.school_id.id)])
         standard = user_teacher.standard_ids
         student = standard.student_ids
         subject = Subject_obj.search([])
-        survey = Survey_obj.search([])
-        Results = result_input.sudo().search(domain, order=order, limit=self._items_per_page, offset=pager['offset'])
-        if groupby == 'none':
-            grouped_result = []
-            if Results:
-                grouped_result = [Results]
-        else:
+        surveys = Survey_obj.search([])
+        total_results = result_input_sudo.search_count(domain)
+        pager = request.website.pager(
+            url='/result',
+            url_args={'date_begin': date_begin, 'date_end': date_end, 'sortby': sortby, 'filterby': filterby, 'groupby': groupby},
+            total=total_results,
+            page=page,
+            step=self._items_per_page,
+        )
+
+        Results = result_input_sudo.search(domain, order=order, limit=self._items_per_page, offset=(page - 1) * self._items_per_page)
+
+        grouped_result = []
+        if groupby == 'Exam':
             grouped_result = [result_input_sudo.concat(*g) for k, g in groupbyelem(Results, itemgetter('survey_id'))]
+        else:
+            grouped_result = [Results] if Results else []
+
         values.update({
             'date': date_begin,
             'results': Results,
@@ -149,19 +132,21 @@ class WebsiteMyAccount(CustomerPortal):
             'standards': standard,
             'students': student,
             'subjects': subject,
-            'surveys': survey,
+            'surveys': surveys,
             'grouped_result': grouped_result,
             'page_name': 'result',
             'default_url': '/result',
-            'pager': pager,
             'searchbar_sortings': searchbar_sortings,
             'searchbar_filters': OrderedDict(sorted(searchbar_filters.items())),
             'searchbar_groupby': searchbar_groupby,
             'sortby': sortby,
             'groupby': groupby,
             'filterby': filterby,
+            'pager': pager,
         })
+
         return request.render("ete_portal.portal_my_result_details", values)
+
 
     # @http.route(['''/my/timeoff/<model('hr.leave'):timeoff>'''], type='http', auth="user", website=True)
     # def portal_my_timeoff(self, timeoff, **kw):

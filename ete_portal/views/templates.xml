@@ -183,8 +183,8 @@
                                 <tr>
                                     <td><span t-field="r.partner_id.name"/></td>
                                     <td>
-                                        <a t-if="r.survey_id.display_name" t-attf-href="/my/timeoff/#{r.id}"><span t-field="r.survey_id.display_name"/></a>
-                                        <a t-else="" class="btn btn-primary btn-sm" t-attf-href="/my/timeoff/#{leave.id}"><span>Exam</span></a>
+                                        <a t-if="r.survey_id.display_name"><span t-field="r.survey_id.display_name"/></a>
+                                        <a t-else="" class="btn btn-primary btn-sm"><span>Exam</span></a>
                                     </td>
                                     <td><span t-field="r.create_date"/></td>
                                     <td><span t-field="r.scoring_percentage"/><span>%</span></td>
