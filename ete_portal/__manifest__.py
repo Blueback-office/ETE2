@@ -19,6 +19,7 @@
         'views/survey_user_input.xml',
         # 'views/relate_emp_portal_user.xml',
         'views/templates.xml',
+        'views/survey_thank_you_page.xml'
     ],
     'assets': {
         'web.assets_frontend': [

@@ -23,20 +23,31 @@ class SurveyUserInput(models.Model):
             student_id = self.env['student.student'].sudo().browse(values['student_id']).partner_id
         teacher = self.env['school.teacher'].sudo().search([('user_id', '=', self.env.user.id)],limit=1)
         lst = []
-        for key,value in values.get('question_id').items():
+        for key, value in values.get('question_id').items():
             domain = []
-            if int(value) == 1:
-                domain = [('question_id', '=', int(key)), ('is_correct', '=', True)]
-            else:
-                domain = [('question_id', '=', int(key)), ('is_correct', '=', False)]
-            question_answer = self.env['survey.question.answer'].search(domain)
-            vals = [0, 0, {
-                'question_id': key,
-                'display_name': value,
-                'suggested_answer_id': question_answer and question_answer[0].id,
-                'answer_type': 'suggestion',
-            }]
-            lst.append(vals)
+            
+            # Search returns a recordset, which can have multiple records
+            question_ids = self.env["survey.question"].search([
+                ("sequence", "=", int(key)),
+                ("survey_id", "=", values.get("survey_id"))
+            ])
+            
+            # Loop through the records in question_ids if there are multiple
+            for question_id in question_ids:
+                if int(value) == 1:
+                    domain = [("question_id", "=", question_id.id), ('is_correct', '=', True)]
+                else:
+                    domain = [("question_id", "=", question_id.id), ('is_correct', '=', False)]
+                
+                question_answer = self.env['survey.question.answer'].search(domain)
+                
+                vals = [0, 0, {
+                    'question_id': question_id.id,
+                    'display_name': value,
+                    'suggested_answer_id': question_answer and question_answer[0].id,
+                    'answer_type': 'suggestion',
+                }]
+                lst.append(vals)
         values = {
             'survey_id': values['survey_id'],
             'partner_id': student_id.id,
