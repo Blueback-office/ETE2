@@ -122,8 +122,8 @@ class StudentStudent(models.Model):
     )
     reg_code = fields.Char(string="Registration Code", help="Student Registration Code")
     student_code = fields.Char(help="Enter student code")
-    contact_phone = fields.Char(string="Phone no.", help="Enter student phone no.",required=True)
-    contact_mobile = fields.Char(string="Mobile no", help="Enter student mobile no.",required=True)
+    contact_phone = fields.Char(string="Phone no.", help="Enter student phone no.", required=False)
+    contact_mobile = fields.Char(string="Mobile no", help="Enter student mobile no.", required=False)
     roll_no = fields.Integer("Roll No.", readonly=True, help="Enter student roll no.")
     leaving_certificate = fields.Char(string="leaving_certificate")
     photo = fields.Binary(default=_default_image, help="Attach student photo")
@@ -150,7 +150,7 @@ class StudentStudent(models.Model):
     leave_date = fields.Date(help="Enter student leave date")
     middle = fields.Char(
         "Middle Name",
-        required=True,
+        required=False,
         # states={"done": [("readonly", True)]},
         help="Enter student middle name",
     )
@@ -167,7 +167,7 @@ class StudentStudent(models.Model):
     )
     date_of_birth = fields.Date(
         "BirthDate",
-        required=True,
+        required=False,
         # states={"done": [("readonly", True)]},
         help="Enter student date of birth",
     )
@@ -326,6 +326,23 @@ class StudentStudent(models.Model):
         help="Activate/Deactivate teacher group",
     )
     subject_id = fields.Many2one("subject.subject", "Subject", help="Subject")
+    result_count = fields.Integer(compute="_compute_results")
+
+    def _compute_results(self):
+        self.result_count = self.env["survey.user_input"].search_count([
+            ("partner_id.student_id", "=", self.id)
+        ])
+
+    def student_results(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Participations',
+            'view_mode': 'tree, form',
+            'views': [(False, 'list'), (False, 'form')],
+            'res_model': 'survey.user_input',
+            'domain': [('partner_id.student_id', '=', self.id)],
+            'context': "{'create': False}"
+        }
 
     # @api.model
     # def get_views(self, views, options=None):
