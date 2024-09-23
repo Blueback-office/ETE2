@@ -85,7 +85,11 @@ class WebsiteMyAccount(CustomerPortal):
         # Default sortby and filterby
         if not sortby:
             sortby = 'partner_id'
-        order = searchbar_sortings[sortby]['order']
+            
+        if groupby == 'Exam': 
+            order = 'survey_id desc, ' + searchbar_sortings[sortby]['order']
+        else:
+            order = searchbar_sortings[sortby]['order']
 
         if not filterby:
             filterby = 'all'
