@@ -31,6 +31,9 @@ class SurveyUserInput(models.Model):
     class_id = fields.Many2one(related='survey_id.class_id')
     standard_id = fields.Many2one(related='survey_id.standard_id')
     subject_id = fields.Many2one(related='survey_id.subject_id')
+    class_store_id = fields.Many2one(related='survey_id.class_id', store=True, readonly=False)
+    standard_store_id = fields.Many2one(related='survey_id.standard_id', store=True, readonly=False)
+    subject_store_id = fields.Many2one(related='survey_id.subject_id', store=True, readonly=False)
 
 
 class SurveyQuestion(models.Model):
