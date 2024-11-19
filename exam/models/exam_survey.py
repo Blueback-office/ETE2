@@ -1,4 +1,4 @@
-from odoo import fields, models
+from odoo import fields, models, api
 
 
 class SurveySurvey(models.Model):
@@ -34,6 +34,21 @@ class SurveyUserInput(models.Model):
     class_store_id = fields.Many2one(related='survey_id.class_id', store=True, readonly=False)
     standard_store_id = fields.Many2one(related='survey_id.standard_id', store=True, readonly=False)
     subject_store_id = fields.Many2one(related='survey_id.subject_id', store=True, readonly=False)
+
+
+class SurveyUserInputLine(models.Model):
+    """Defining a Exam information."""
+
+    _inherit = "survey.user_input.line"
+
+    sub_category_store_id = fields.Many2one(related="question_id.sub_category_id", store=True, readonly=False)
+    student_id = fields.Many2one("res.partner", compute="_compute_student_name", store=True)
+    subject_store_id = fields.Many2one(related='user_input_id.subject_id', store=True, readonly=False)
+
+    @api.depends("user_input_id")
+    def _compute_student_name(self):
+        for line in self:
+            line.student_id =line.user_input_id.partner_id.id or False
 
 
 class SurveyQuestion(models.Model):
