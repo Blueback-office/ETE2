@@ -10,6 +10,7 @@
                 <field name="exam_type" invisible="1"/>
 				<field name='teacher_id' invisible="1"/>
 				<field name='class_id' invisible='1'/>
+				<field name='class_ids' invisible='1' widget="many2many_tags"/>
                 <field name='academic_year_id'/>
                 <field name='s_exam_id' invisible="1"/>
                 <field name="option_count"/>
@@ -22,7 +23,7 @@
                 </group>
             </xpath>
             <xpath expr="//button[@name='action_send_survey']" position='attributes'>
-                <attribute name="context">{'default_standard_id' : class_id}</attribute>
+                <attribute name="context">{'default_classes' : class_ids}</attribute>
             </xpath>
             <xpath expr="//tree/field[@name='constr_mandatory']" position='after'>
                 <field name='sub_category_id'/>
@@ -49,7 +50,8 @@
         <field name='inherit_id' ref='survey.survey_invite_view_form'/>
         <field name='arch' type="xml">
             <xpath expr="//field[@name='partner_ids']" position='attributes'>
-                <attribute name="domain">[('is_student','=', True),('student_id.standard_id','=', context.get('default_standard_id'))]</attribute>
+                <attribute name="domain">[('is_student','=', True),('student_id.standard_id','in',
+                    context.get('default_classes'))]</attribute>
             </xpath>
         </field>
     </record>

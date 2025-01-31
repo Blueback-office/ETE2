@@ -20,8 +20,16 @@ class SurveySurvey(models.Model):
         ("four", "Four Way Correction"),
         ("online", "Online")
     ])
+    class_ids = fields.Many2many("school.standard", string="Classes")
     option_count = fields.Char(string="No of options", placeholder="2 or 4", default="2")
 
+    @api.onchange("standard_id")
+    def _onchange_standard_id(self):
+        if self.standard_id:
+            class_recs = self.env["school.standard"].search([
+                ("standard_id", "=", self.standard_id.id)
+            ])
+            self.class_ids = [(6,0, class_recs.ids)]
 
 class SurveyUserInput(models.Model):
     """Defining a Exam information."""
