@@ -2,7 +2,7 @@
 
 {
     "name": "Exam Management for Education ERP",
-    "version": "17.0.1.1.1",
+    "version": "17.0.1.1.2",
     "author": "Serpent Consulting Services Pvt. Ltd.",
     "website": "https://github.com/OCA/delivery-carrier",
     "category": "School Management",
