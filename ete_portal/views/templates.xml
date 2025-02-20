@@ -163,9 +163,13 @@
                     <t t-foreach="grouped_result" t-as="result">
                         <thead>
                             <tr t-attf-class="{{'thead-light' if not groupby == 'none' else ''}}">
-                                <th t-if="groupby == 'none'">Student Id</th>
+                                <th t-if="groupby == 'none'"> 
+                                    <em t-if="request.env.user.is_student">Student Id</em>
+                                    <!-- <em t-else="">Teacher Id</em> -->
+                                </th>
                                 <th t-else="">
-                                    <em class="font-weight-normal text-muted">Student Id:</em>
+                                    <em t-if="request.env.user.is_student">Student Id</em>
+                                    <em  class="font-weight-normal text-muted">Survey:</em>
                                     <span t-field="result[0].survey_id.display_name"/></th>
                                 <th>Exam</th>  <!-- survey_id -->
                                 <th>Created date</th> <!-- create_date -->
@@ -179,8 +183,8 @@
                                 <tr>
                                     <td><span t-field="r.partner_id.name"/></td>
                                     <td>
-                                        <a t-if="r.survey_id.display_name" t-attf-href="/my/timeoff/#{r.id}"><span t-field="r.survey_id.display_name"/></a>
-                                        <a t-else="" class="btn btn-primary btn-sm" t-attf-href="/my/timeoff/#{leave.id}"><span>Exam</span></a>
+                                        <a t-if="r.survey_id.display_name"><span t-field="r.survey_id.display_name"/></a>
+                                        <a t-else="" class="btn btn-primary btn-sm"><span>Exam</span></a>
                                     </td>
                                     <td><span t-field="r.create_date"/></td>
                                     <td><span t-field="r.scoring_percentage"/><span>%</span></td>

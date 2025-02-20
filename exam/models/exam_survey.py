@@ -1,4 +1,4 @@
-from odoo import fields, models
+from odoo import fields, models, api
 
 
 class SurveySurvey(models.Model):
@@ -9,6 +9,7 @@ class SurveySurvey(models.Model):
     is_ete_survey = fields.Boolean()
     school_id = fields.Many2one('school.school', 'School')
     teacher_id = fields.Many2one('school.teacher', 'Teacher')
+    teacher_ids = fields.Many2many('school.teacher', string='Teachers')
     class_id = fields.Many2one('school.standard', 'Class')
     standard_id = fields.Many2one('standard.standard', 'Standard')
     academic_year_id = fields.Many2one("academic.year", 'Academic Year', help="Select Academic Year")
@@ -19,8 +20,16 @@ class SurveySurvey(models.Model):
         ("four", "Four Way Correction"),
         ("online", "Online")
     ])
+    class_ids = fields.Many2many("school.standard", string="Classes")
     option_count = fields.Char(string="No of options", placeholder="2 or 4", default="2")
 
+    @api.onchange("standard_id")
+    def _onchange_standard_id(self):
+        if self.standard_id:
+            class_recs = self.env["school.standard"].search([
+                ("standard_id", "=", self.standard_id.id)
+            ])
+            self.class_ids = [(6,0, class_recs.ids)]
 
 class SurveyUserInput(models.Model):
     """Defining a Exam information."""
@@ -30,6 +39,24 @@ class SurveyUserInput(models.Model):
     class_id = fields.Many2one(related='survey_id.class_id')
     standard_id = fields.Many2one(related='survey_id.standard_id')
     subject_id = fields.Many2one(related='survey_id.subject_id')
+    class_store_id = fields.Many2one(related='survey_id.class_id', store=True, readonly=False)
+    standard_store_id = fields.Many2one(related='survey_id.standard_id', store=True, readonly=False)
+    subject_store_id = fields.Many2one(related='survey_id.subject_id', store=True, readonly=False)
+
+
+class SurveyUserInputLine(models.Model):
+    """Defining a Exam information."""
+
+    _inherit = "survey.user_input.line"
+
+    sub_category_store_id = fields.Many2one(related="question_id.sub_category_id", store=True, readonly=False)
+    student_id = fields.Many2one("res.partner", compute="_compute_student_name", store=True)
+    subject_store_id = fields.Many2one(related='user_input_id.subject_id', store=True, readonly=False)
+
+    @api.depends("user_input_id")
+    def _compute_student_name(self):
+        for line in self:
+            line.student_id =line.user_input_id.partner_id.id or False
 
 
 class SurveyQuestion(models.Model):

@@ -5,6 +5,7 @@
         <field name="model">student.student</field>
         <field name="arch" type="xml">
             <form string="Student Information" create="false" delete="false">
+
                 <header>
                     <button
                         class="oe_highlight oe_stat_button"
@@ -41,6 +42,11 @@
                     />
                 </header>
                 <sheet>
+                    <div name="button_box" position="inside">
+                        <button class="oe_stat_button" type="object" name="student_results" icon="fa-calendar">
+                            <field string="Student Results" name="result_count" widget="statinfo"/>
+                        </button>
+                    </div>
                     <div class="oe_button_box" name="buttons" />
                     <div class="oe_inline">
                         <newline />
@@ -90,6 +96,7 @@
                             />
                             <field
                                 name="country_id"
+                                required="0"
                                 readonly="state in ['alumni','terminate']"
                             />
                             <field
@@ -159,14 +166,14 @@
                                     name="city"
                                     placeholder="City"
                                     class="o_address_city"
-                                    required="1"
+                                    required="0"
                                     readonly="state in ['alumni','terminate']"
                                 />
                                 <field
                                     name="state_id"
                                     domain="[('country_id','=',country_id)]"
                                     class="o_address_state"
-                                    required="1"
+                                    required="0"
                                     placeholder="State"
                                     options="{&quot;no_open&quot;: True}"
                                     readonly="state in ['alumni','terminate']"
@@ -182,7 +189,7 @@
                                     placeholder="Country"
                                     class="o_address_country,oe_no_button"
                                     options="{&quot;no_open&quot;: True}"
-                                    required="1"
+                                    required="0"
                                     readonly="state in ['alumni','terminate']"
                                 />
                             </div>
@@ -233,7 +240,7 @@
                                         name="gender"
                                         readonly="state in ['alumni','terminate'] or state == 'done'"
                                         placeholder="Gender"
-                                        required="1"
+                                        required="0"
                                     />
                                     <field name="age" />
                                 </group>
@@ -973,6 +980,11 @@
                     />
                 </header>
                 <sheet>
+                    <div name="button_box" position="inside">
+                        <button class="oe_stat_button" type="object" name="student_results" icon="fa-calendar">
+                            <field string="Student Results" name="result_count" widget="statinfo"/>
+                        </button>
+                    </div>
                     <div class="oe_inline">
                         <newline />
                         <separator string="Personal Information" />
@@ -1073,7 +1085,7 @@
                                     name="country_id"
                                     placeholder="Country"
                                     class="o_address_country,oe_no_button"
-                                    required="1"
+                                    required="0"
                                     options="{&quot;no_open&quot;: True}"
                                     readonly="state =='alumni'"
                                 />
@@ -1081,7 +1093,7 @@
                                     name="city"
                                     placeholder="City"
                                     class="o_address_city"
-                                    required="1"
+                                    required="0"
                                     readonly="state =='alumni'"
                                 />
                                 <field
@@ -1090,7 +1102,7 @@
                                     domain="[('country_id','=',country_id)]"
                                     placeholder="State"
                                     options="{&quot;no_open&quot;: True}"
-                                    required="1"
+                                    required="0"
                                     readonly="state =='alumni'"
                                 />
                                 <field
@@ -1137,7 +1149,6 @@
                                                 placeholder="Gender"
                                                 string="Gender"
                                                 readonly="state =='alumni'"
-                                                required="1"
                                             />
                                             <field
                                                 name="date_of_birth"

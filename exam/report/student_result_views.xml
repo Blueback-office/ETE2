@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_survey_pivot" model="ir.ui.view">
+        <field name="name">survey.pivot.report.pivot</field>
+        <field name="model">survey.pivot.report</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="id"/>
+                <field name="survey_id" type="row"/>
+                <field name="student_id" type="row"/>
+                <field name="subject_category_id"/>
+                <field name="total_answers" string="Question Count" type="measure"/>
+                <field name="total_score" string="Score" type="measure"/>
+                <field name="percentage_score" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="survey_pivot_view_report_search" model="ir.ui.view">
+        <field name="name">survey.pivot.report.view.search</field>
+        <field name="model">survey.pivot.report</field>
+        <field name="arch" type="xml">
+            <search string="Search Survey User">
+                <field name="student_id" string="Student" filter_domain="[('student_id', 'ilike', self)]"/>
+                <field name="survey_id"/>
+                <field name="subject_category_id" />
+                <group expand="0" string="Group By">
+                    <filter name="group_by_survey_report" string="Survey" domain="[]"
+                            context="{'group_by': 'survey_id'}"/>
+                    <filter string="Student" name="group_by_partner_report" domain="[]"
+                            context="{'group_by': 'student_id'}"/>
+                    <filter string="Subject Category" name="group_by_subject_report" domain="[]"
+                            context="{'group_by': 'subject_category_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_survey_pivot" model="ir.actions.act_window">
+        <field name="name">Survey Pivot Analysis</field>
+        <field name="res_model">survey.pivot.report</field>
+        <field name="view_mode">pivot</field>
+    </record>
+
+    <menuitem id="menu_survey_pivot" name="Survey Pivot Report"
+              parent="exam.reporting_menu"
+              action="action_survey_pivot"/>
+</odoo>

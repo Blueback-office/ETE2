@@ -948,4 +948,143 @@
         sequence="105"
     />
 
+
+
+    <menuitem id="reporting_menu" name="Reporting" parent="school.menu_ems" sequence="10" />
+
+    <record id="survey_user_exam_input_view_search" model="ir.ui.view">
+        <field name="name">survey.user_input.exam.view.search</field>
+        <field name="model">survey.user_input</field>
+        <field name="arch" type="xml">
+            <search string="Search Survey User Inputs">
+                <field name="email" string="Participant" filter_domain="[
+                    '|',
+                    ('partner_id', 'ilike', self),
+                    ('email', 'ilike', self)]"/>
+                <field name="partner_id"/>
+                <field name="survey_id"/>
+                <field name="standard_store_id" />
+                <field name="subject_store_id" />
+                <filter name="completed" string="Completed" domain="[('state', '=', 'done')]"/>
+                <filter string="In Progress" name="in_progress" domain="[('state', '=', 'in_progress')]"/>
+                <filter string="New" name="new" domain="[('state', '=', 'new')]"/>
+                <separator/>
+                <filter string="Exam Passed" name="scoring_success" domain="[('scoring_success','=', True)]"/>
+                <filter string="Exam Failed" name="scoring_success" domain="[('scoring_success','=', False)]"/>
+                <separator/>
+                <filter string="Tests Only" name="test" domain="[('test_entry','=', True)]"/>
+                <filter string="Exclude Tests" name="not_test" domain="[('test_entry','=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_by_survey" string="Survey" domain="[]" context="{'group_by': 'survey_id'}"/>
+                    <filter string="Email" name="group_by_email" domain="[]" context="{'group_by': 'email'}"/>
+                    <filter string="Partner" name="group_by_partner" domain="[]" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Subject" name="group_by_subject" domain="[]"
+                            context="{'group_by': 'subject_store_id'}"/>
+                    <filter string="Standard" name="group_by_standard" domain="[]"
+                            context="{'group_by': 'standard_store_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="survey_exam_analysis_view_tree" model="ir.ui.view">
+        <field name="name">survey.exam.input</field>
+        <field name="model">survey.user_input</field>
+        <field name="arch" type="xml">
+            <tree decoration-muted="test_entry == True" create="false">
+                <field name="create_date"/>
+                <field name="survey_id" string="Exam"/>
+                <field name="nickname" optional="hide"/>
+                <field name="partner_id" optional="show"/>
+                <field name="standard_store_id" optional="show"/>
+                <field name="subject_store_id" optional="show"/>
+                <field name="email" optional="show"/>
+                <field name="attempts_number"/>
+                <field name="deadline"/>
+                <field name="test_entry" column_invisible="True"/>
+                <field name="scoring_success"/>
+                <field name="scoring_percentage"/>
+                <field name="state" widget="badge"
+                    decoration-success="state == 'done'"
+                    decoration-warning="state == 'new'"
+                    decoration-info="state == 'in_progress'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_survey_exam_analysis" model="ir.actions.act_window">
+        <field name="name">Student Exam Analysis</field>
+        <field name="res_model">survey.user_input</field>
+        <field name="view_mode">tree,form,pivot</field>
+        <field name="view_id" ref="exam.survey_exam_analysis_view_tree"/>
+        <field name="search_view_id" ref="exam.survey_user_exam_input_view_search"/>
+        <field name="context">{'search_default_group_by_survey': True}</field>
+    </record>
+
+    <menuitem
+        id="student_report_menu"
+        name="Student Exam Analysis"
+        parent="reporting_menu"
+        action="action_survey_exam_analysis"
+        sequence="101"
+    />
+
+    <record id="survey_answer_line_view_tree" model="ir.ui.view">
+        <field name="name">survey.user_input.line.answer.view.tree</field>
+        <field name="model">survey.user_input.line</field>
+        <field name="arch" type="xml">
+            <tree string="Survey Line" create="false">
+                <field name="survey_id"/>
+                <field name="user_input_id"/>
+                <field name="question_id"/>
+                <field name="subject_store_id"/>
+                <field name="sub_category_store_id"/>
+                <field name="student_id"/>
+                <field name="create_date"/>
+                <field name="answer_type"/>
+                <field name="skipped"/>
+                <field name="answer_score" groups="base.group_no_one"/>
+            </tree>
+        </field>
+    </record>
+    <record id="survey_user_input_line_answer_view_search" model="ir.ui.view">
+        <field name="name">survey.user_input.line.answer.view.search</field>
+        <field name="model">survey.user_input.line</field>
+        <field name="arch" type="xml">
+            <search string="Search User input lines">
+                <field name="user_input_id"/>
+                <field name="survey_id"/>
+                <field name="sub_category_store_id"/>
+                <field name="student_id"/>
+                <field name="subject_store_id"/>
+                <group expand="1" string="Group By">
+                    <filter name="group_by_survey" string="Survey" domain="[]"  context="{'group_by':'survey_id'}"/>
+                    <filter name="group_by_student" string="Student" domain="[]"  context="{'group_by':'student_id'}"/>
+                    <filter name="group_by_question" string="Question" domain="[]"
+                            context="{'group_by':'question_id'}"/>
+                    <filter name="group_by_subject" string="Subject" domain="[]"
+                            context="{'group_by':'subject_store_id'}"/>
+                    <filter name="group_by_subject_category" string="Subject Category" domain="[]"
+                            context="{'group_by':'sub_category_store_id'}"/>
+                    <filter name="group_by_user_input" string="User Input" domain="[]"  context="{'group_by':'user_input_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_survey_answer_analysis" model="ir.actions.act_window">
+        <field name="name">Student Answer Analysis</field>
+        <field name="res_model">survey.user_input.line</field>
+        <field name="view_mode">tree,form,pivot</field>
+        <field name="view_id" ref="exam.survey_answer_line_view_tree"/>
+        <field name="search_view_id" ref="exam.survey_user_input_line_answer_view_search"/>
+    </record>
+
+    <menuitem
+        id="student_answer_report_menu"
+        name="Student Answer Analysis"
+        parent="reporting_menu"
+        action="action_survey_answer_analysis"
+        sequence="101"
+    />
 </odoo>
