@@ -1037,13 +1037,15 @@
                 <field name="survey_id"/>
                 <field name="user_input_id"/>
                 <field name="question_id"/>
-                <field name="subject_store_id"/>
                 <field name="sub_category_store_id"/>
                 <field name="student_id"/>
+                <field name="class_id" invisible="1"/>
+<!--                <field name="aggregate_percentage"/>-->
                 <field name="create_date"/>
                 <field name="answer_type"/>
                 <field name="skipped"/>
                 <field name="answer_score" groups="base.group_no_one"/>
+                <field name="subject_store_id"/>
             </tree>
         </field>
     </record>

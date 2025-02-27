@@ -37,12 +37,108 @@
     </record>
 
     <record id="action_survey_pivot" model="ir.actions.act_window">
-        <field name="name">Survey Pivot Analysis</field>
+        <field name="name">Student Pivot Analysis</field>
         <field name="res_model">survey.pivot.report</field>
         <field name="view_mode">pivot</field>
     </record>
 
-    <menuitem id="menu_survey_pivot" name="Survey Pivot Report"
+    <menuitem id="menu_survey_pivot" name="Student Pivot Report"
               parent="exam.reporting_menu"
               action="action_survey_pivot"/>
+
+    <record id="view_school_pivot" model="ir.ui.view">
+        <field name="name">school.pivot.report.pivot</field>
+        <field name="model">school.pivot.report</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="id"/>
+                <field name="survey_id" type="row"/>
+                <field name="school_id" type="row"/>
+                <field name="subject_category_id"/>
+
+                <field name="total_answers" string="Question Count" type="measure"/>
+                <field name="total_score" string="Score" type="measure"/>
+                <field name="percentage_score" type="measure"/>
+
+            </pivot>
+        </field>
+    </record>
+
+    <record id="school_pivot_view_report_search" model="ir.ui.view">
+        <field name="name">school.pivot.report.view.search</field>
+        <field name="model">school.pivot.report</field>
+        <field name="arch" type="xml">
+            <search string="Search School User">
+                <field name="school_id" string="School" filter_domain="[('school_id', 'ilike', self)]"/>
+                <field name="survey_id"/>
+                <field name="subject_category_id" />
+                <group expand="0" string="Group By">
+                    <filter name="group_by_survey_school_report" string="Survey" domain="[]"
+                            context="{'group_by': 'survey_id'}"/>
+                    <filter string="School" name="group_by_school_report" domain="[]"
+                            context="{'group_by': 'school_id'}"/>
+                    <filter string="Subject Category" name="group_by_su_subject_report" domain="[]"
+                            context="{'group_by': 'subject_category_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_school_pivot" model="ir.actions.act_window">
+        <field name="name">School Pivot Analysis</field>
+        <field name="res_model">school.pivot.report</field>
+        <field name="view_mode">pivot</field>
+    </record>
+
+    <menuitem id="menu_school_pivot" name="School Pivot Report"
+              parent="exam.reporting_menu"
+              action="action_school_pivot"/>
+
+
+    <record id="view_class_pivot" model="ir.ui.view">
+        <field name="name">class.pivot.report.pivot</field>
+        <field name="model">class.pivot.report</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="id"/>
+                <field name="survey_id" type="row"/>
+                <field name="class_id" type="row"/>
+                <field name="subject_category_id"/>
+                <field name="total_answers" string="Question Count" type="measure"/>
+                <field name="total_score" string="Score" type="measure"/>
+                <field name="percentage_score" type="measure"/>
+
+            </pivot>
+        </field>
+    </record>
+
+    <record id="class_pivot_view_report_search" model="ir.ui.view">
+        <field name="name">class.pivot.report.view.search</field>
+        <field name="model">class.pivot.report</field>
+        <field name="arch" type="xml">
+            <search string="Search Class">
+                <field name="class_id" string="School" filter_domain="[('class_id', 'ilike', self)]"/>
+                <field name="survey_id"/>
+                <field name="subject_category_id" />
+                <group expand="0" string="Group By">
+                    <filter name="group_by_class_survey_report" string="Survey" domain="[]"
+                            context="{'group_by': 'survey_id'}"/>
+                    <filter string="Class" name="group_by_class_report" domain="[]"
+                            context="{'group_by': 'class_id'}"/>
+                    <filter string="Subject Category" name="group_by_class_subject_report" domain="[]"
+                            context="{'group_by': 'subject_category_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_class_pivot" model="ir.actions.act_window">
+        <field name="name">Class Pivot Analysis</field>
+        <field name="res_model">class.pivot.report</field>
+        <field name="view_mode">pivot</field>
+    </record>
+
+    <menuitem id="menu_class_pivot" name="Class Pivot Report"
+              parent="exam.reporting_menu"
+              action="action_class_pivot"/>
 </odoo>

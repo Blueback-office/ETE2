@@ -52,6 +52,8 @@ class SurveyUserInputLine(models.Model):
     sub_category_store_id = fields.Many2one(related="question_id.sub_category_id", store=True, readonly=False)
     student_id = fields.Many2one("res.partner", compute="_compute_student_name", store=True)
     subject_store_id = fields.Many2one(related='user_input_id.subject_id', store=True, readonly=False)
+    school_id = fields.Many2one(related="student_id.student_id.school_id", store=True, readonly=False)
+    class_id = fields.Many2one(related="student_id.student_id.standard_id", store=True, readonly=False)
 
     @api.depends("user_input_id")
     def _compute_student_name(self):
